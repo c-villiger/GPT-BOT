@@ -12,7 +12,10 @@ import shutil
 
 
 # os.environ['OPENAI_API_KEY'] = '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'
-openai.api_key = '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'
+with open("api_key.txt", "r") as file:
+    api_key = file.read().strip()
+print(api_key)
+openai.api_key = api_key
 
 
 def prompt_openai_api(prompt):
@@ -107,7 +110,7 @@ def filter_code_lines_functions_only(code):
 
 def filter_code_lines(code):
     # Define a regular expression pattern to match common code elements
-    pattern = re.compile(r'\s*(import|from|def|class|\w+\s*=|if|elif|else|for|while|try|except|with|return|print|\(|\)|\[|\]|{|}|#|"""|:|.|"|\'|\(|\))')
+    pattern = re.compile(r'\s*(import|from|def|class|\w+\s*=|if|=|elif|else|for|while|try|except|raise|with|return|append|print|\(|\)|\[|\]|{|}|#|"""|:|"|\'|\(|\))')
 
     # Split the input string into lines
     lines = code.split('\n')

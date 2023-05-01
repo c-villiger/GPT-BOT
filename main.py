@@ -48,9 +48,9 @@ def main():
 
             code_prompt = f"Write a single {task_description_dict['language']} function for the following subtask. Please ONLY give the function and no additional text response and end every function with a return statement: '{subtask}'. \
                 This is a list of all the subtasks that have been generated so far:\n\n {subtasks} \n\n. \
-                Please stay consistent with the function names and return variables, according to the previous subtasks, if they were already generated. \
+                Please stay consistent with the function names and return variables, according to the previous subtasks, if they were already generated. Do NOT generate additional text, only the code functions.\
                 Here are the function names and return variables that have been generated so far:\n\n {function_return_dict} \n\n. \
-                If it is empty, simply assume that this is the first subtask."
+                If it is empty, simply assume that this is the first subtask. Please make an error in every function for testing puporses."
 
             code_snippet = prompt_openai_api(code_prompt)
 
