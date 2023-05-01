@@ -8,13 +8,12 @@ from tabulate import tabulate
 from termcolor import colored
 import shutil
 
-# TODO reprovide the error message and function to the api and update it directly
 
 
-# os.environ['OPENAI_API_KEY'] = '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'
+# Retrieve API key
 with open("api_key.txt", "r") as file:
     api_key = file.read().strip()
-print(api_key)
+
 openai.api_key = api_key
 
 
@@ -29,8 +28,7 @@ def prompt_openai_api(prompt):
 
 def generate_subtasks(task_description, script_type):
 
-    prompt = f"Given the task: '{task_description}', please provide a list of subtasks to complete the the task. The last subtask should be to run the code, i.e. call the functions,\
-        thus it should not be a function itself.\
+    prompt = f"Given the task: '{task_description}', please provide a list of subtasks to complete the the task.\
         Structure the subtasks such that each one can be completed in the scope of one code function. Please number the subtasks and do not make subpoints for each subtask."
     subtasks_str = prompt_openai_api(prompt)
     subtasks = [subtask[2:] if subtask.startswith(
@@ -63,7 +61,7 @@ def read_task_description(file_path):
 
 
 def extract_function_and_return_var(code_snippet):
-    function_name_pattern = re.compile(r"^\s*def\s+(\w+)\s*\(")
+    function_name_pattern = re.compile(r"^\s*def\s+(\w+)\s*\((.*?)\)\s*:")
     return_var_pattern = re.compile(r"^\s*return\s+(\w+)")
 
     function_name = None
@@ -74,6 +72,7 @@ def extract_function_and_return_var(code_snippet):
             match = function_name_pattern.match(line)
             if match:
                 function_name = match.group(1)
+                function_params = match.group(2)
 
         if not return_var:
             match = return_var_pattern.match(line)
@@ -83,7 +82,7 @@ def extract_function_and_return_var(code_snippet):
         if function_name and return_var:
             break
 
-    return {function_name: return_var}
+    return {f"{function_name}({function_params})": return_var}
 
 
 def filter_code_lines_functions_only(code):

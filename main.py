@@ -34,7 +34,7 @@ def main():
         # Generate subtasks for each script type
         subtasks = generate_subtasks(
             task_description_dict['task'], script_type)
-
+        
         print_boxed_header(f"{script_type.capitalize()} Subtasks:", "white")
         print("----------------------------------------------------------------------------------")
         for task in subtasks:
@@ -50,7 +50,7 @@ def main():
                 This is a list of all the subtasks that have been generated so far:\n\n {subtasks} \n\n. \
                 Please stay consistent with the function names and return variables, according to the previous subtasks, if they were already generated. Do NOT generate additional text, only the code functions.\
                 Here are the function names and return variables that have been generated so far:\n\n {function_return_dict} \n\n. \
-                If it is empty, simply assume that this is the first subtask. Please make an error in every function for testing puporses."
+                If it is empty, simply assume that this is the first subtask."
 
             code_snippet = prompt_openai_api(code_prompt)
 
@@ -58,6 +58,11 @@ def main():
             function_return_dict.update(func_and_var)
 
             code += f"\n{code_snippet}\n"
+
+        # Add prompt to add some lines to actually run the code
+        run_code_prompt = f"You have generated the following functions and returned variables:\n\n{function_return_dict}\n\n \
+            Please provide the code that calls these functions in the correct order, to achieve the final goal given in the task description {task_description_dict['task']}."
+        code += prompt_openai_api(run_code_prompt)
 
         language_to_extension = {
             "python": ".py",
