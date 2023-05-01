@@ -28,7 +28,7 @@ def prompt_openai_api(prompt):
 
 def generate_subtasks(task_description, script_type):
 
-    prompt = f"Given the task: '{task_description}', please provide a list of subtasks to complete the the task.\
+    prompt = f"Given the task: '{task_description}', please provide a list of subtasks to complete the the task. Please try to do as much as sensibly possible in one subtask.\
         Structure the subtasks such that each one can be completed in the scope of one code function. Please number the subtasks and do not make subpoints for each subtask."
     subtasks_str = prompt_openai_api(prompt)
     subtasks = [subtask[2:] if subtask.startswith(
@@ -66,13 +66,14 @@ def extract_function_and_return_var(code_snippet):
 
     function_name = None
     return_var = None
+    function_params = ""
 
     for line in code_snippet.split('\n'):
         if not function_name:
             match = function_name_pattern.match(line)
             if match:
                 function_name = match.group(1)
-                function_params = match.group(2)
+                function_params = match.group(2) or ""
 
         if not return_var:
             match = return_var_pattern.match(line)
@@ -109,7 +110,7 @@ def filter_code_lines_functions_only(code):
 
 def filter_code_lines(code):
     # Define a regular expression pattern to match common code elements
-    pattern = re.compile(r'\s*(import|from|def|class|\w+\s*=|if|=|elif|else|for|while|try|except|raise|with|return|append|print|\(|\)|\[|\]|{|}|#|"""|:|"|\'|\(|\))')
+    pattern = re.compile(r'\s*(import|from|def|class|\w+\s*=|if|\=|\*|\+|_|=|elif|else|for|while|try|except|raise|with|return|append|print|\(|\)|\[|\]|{|}|#|"""|:|"|\'|\(|\))')
 
     # Split the input string into lines
     lines = code.split('\n')
@@ -319,8 +320,8 @@ def run_main_script_and_check_error(name, filename, language):
 
         if result.returncode != 0:
             error_message = result.stderr.strip()
-
-            print_boxed_header(f"An error occurred:", "red")
+            error_type = "Error" if "Traceback" not in error_message else "Exception"
+            print_boxed_header(f"An {error_type} occurred:", "red")
             print(error_message)
 
             # Extract the erroneous function
@@ -349,7 +350,14 @@ def run_main_script_and_check_error(name, filename, language):
                 else:
                     break
         else:
-            print_boxed_header(f"No error occurred.", "green")
+            print_boxed_header(f"No error occurred. Output:", "green")
+
+            # Read the output from the subprocess
+            stdout, stderr = result.communicate()
+
+            # Print the output
+            print(stdout.decode())
+            print(stderr.decode())
             break
 
 

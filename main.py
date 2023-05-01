@@ -47,6 +47,7 @@ def main():
         for index, subtask in enumerate(subtasks):
 
             code_prompt = f"Write a single {task_description_dict['language']} function for the following subtask. Please ONLY give the function and no additional text response and end every function with a return statement: '{subtask}'. \
+                Please also annotate all parts of the functions.\
                 This is a list of all the subtasks that have been generated so far:\n\n {subtasks} \n\n. \
                 Please stay consistent with the function names and return variables, according to the previous subtasks, if they were already generated. Do NOT generate additional text, only the code functions.\
                 Here are the function names and return variables that have been generated so far:\n\n {function_return_dict} \n\n. \
@@ -60,8 +61,9 @@ def main():
             code += f"\n{code_snippet}\n"
 
         # Add prompt to add some lines to actually run the code
-        run_code_prompt = f"You have generated the following functions and returned variables:\n\n{function_return_dict}\n\n \
-            Please provide the code that calls these functions in the correct order, to achieve the final goal given in the task description {task_description_dict['task']}."
+        run_code_prompt = f"You have generated the following functions and returned variables:\n\n{function_return_dict} according to these subtasks: {subtasks}.\
+            Please provide the code that calls these functions in the correct order (do not create new functions), to achieve the final goal given in the task description {task_description_dict['task']}.\
+            Create all variables that are needed to run the code and make them up if necessary. Print the final output."
         code += prompt_openai_api(run_code_prompt)
 
         language_to_extension = {

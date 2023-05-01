@@ -1,3 +1,3 @@
 name: linear_regression 
-task: write a program that creates random dataframes and then runs regressions on them and prints the coefficients. do not use the 'random' package.
+task: write code to simulate a student t distribution and then calculate the empirical expected shortfall with alpha=0.05.
 language: python
