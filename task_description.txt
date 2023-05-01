@@ -1,0 +1,3 @@
+name: linear_regression 
+task: write a program that creates random dataframes and then runs regressions on them and prints the coefficients. do not use the 'random' package.
+language: python
